@@ -123,13 +123,13 @@ public class seleniumTestScript1 {
 	@Test
 	public void webdriverCommands3() throws InterruptedException {
 		
-		if (System.getProperty("os.name").equals("windows")) {
+		/*if (System.getProperty("os.name").equals("windows")) {
 			System.setProperty("webdriver.gecko.driver",
 					System.getProperty("user.dir") + File.separator + "geckodriver.exe");
 		} else {
 			System.setProperty("webdriver.gecko.driver",
 					System.getProperty("user.dir") + File.separator + "geckodriver");
-		}
+		}*/
 
 		WebDriver driver = new FirefoxDriver(); // This will launch Firefox browser
 		driver.get("http://automationpractice.com/index.php"); // This will launch the application
@@ -169,8 +169,12 @@ public class seleniumTestScript1 {
 		
 		driver.quit();
 		
+	}
+	
+	@Test
+	public void testMethod() {
 		
-		
+		System.out.println("This is a Test Method");
 	}
 	
 	

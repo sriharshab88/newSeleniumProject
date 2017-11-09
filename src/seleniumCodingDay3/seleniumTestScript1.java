@@ -173,6 +173,8 @@ public class seleniumTestScript1 {
 		
 	}
 	
+	
+	//test comment added by Chenlin Zhong
 	@Test
 	public void testMethod(){
 		

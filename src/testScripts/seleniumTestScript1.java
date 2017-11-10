@@ -1,4 +1,4 @@
-package seleniumCodingDay3;
+package testScripts;
 
 import java.io.File;
 
@@ -13,62 +13,55 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
+import org.testng.Reporter;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import org.testng.reporters.jq.Main;
 
+import libraries.Utilities;
+import pageObjects.HomePageObject;
+import pageObjects.LoginPageObject;
+
+
+
+
+/**
+ * This file has the test scripts for the basic functionalities of demo application
+ * @author Sri harsha
+ */
 public class seleniumTestScript1 {
 	
-	@Test
-	public void webDriverCommands() {
-
-		if (System.getProperty("os.name").equals("windows")) {
-			System.setProperty("webdriver.gecko.driver",
-					System.getProperty("user.dir") + File.separator + "geckodriver.exe");
-		} else {
-			System.setProperty("webdriver.gecko.driver",
-					System.getProperty("user.dir") + File.separator + "geckodriver");
-
-		}
-
-		WebDriver driver = new FirefoxDriver(); // This will launch Firefox browser
-		driver.get("http://automationpractice.com/index.php"); // This will launch the application
-
-		System.out.println("This is the current URL -->" + driver.getCurrentUrl()); // Print the url of the page.
-		System.out.println("This is the Window title -->" + driver.getTitle()); // Print the title of the page.
+	WebDriver driver;
+	WebDriverWait wait;
+	HomePageObject homepage;
+	LoginPageObject loginpage;
+	Utilities utilities = new Utilities();
+	
+	@BeforeTest
+	public void startBrowser() {
+		driver = utilities.launchBrowser();
+		wait = new WebDriverWait(driver, 30);
 		driver.manage().window().maximize(); // Maximize the browser window
+		homepage = new HomePageObject(driver, wait);
+		loginpage = new LoginPageObject(driver, wait);
+	}
+	
+	@Test
+	public void webDriverCommands() throws Exception {
 
-		WebElement signInLink = driver.findElement(By.xpath("//a[@class='login']")); // Will identify the sign in link
-																						// and stores
-		signInLink.click(); // Clicks the sign in link
+		Reporter.log("This is the current URL -->" + driver.getCurrentUrl(), true); // Print the url of the page.
+		Reporter.log("This is the Window title -->" + driver.getTitle(), true); // Print the title of the page.
 
-		driver.findElement(By.xpath("//input[@id='email']")).sendKeys("testautomation88@test.com"); // Enter the
-																									// username in email
-																									// text field
-		WebElement password = driver.findElement(By.id("passwd")); // Identifies password web element and stores
-		password.sendKeys("123456"); // Enters text into the password field
-		driver.findElement(By.xpath("//button[@id='SubmitLogin']")).click(); // clicks on submit button
-
-		// driver.close(); //close the browser
-		driver.quit(); // Quit the Service and all opened instances of the browser
-
+		homepage.clickSignInLink();
+		loginpage.enterUsername("testautomation88@test.com");
+		loginpage.enterPassword("123456");
+		loginpage.clickSignInButton();
 	}
 
 	@Test
 	public void webDriverCommands2() throws InterruptedException {
-
-		if (System.getProperty("os.name").equals("windows")) {
-			System.setProperty("webdriver.gecko.driver",
-					System.getProperty("user.dir") + File.separator + "geckodriver.exe");
-		} else {
-			System.setProperty("webdriver.gecko.driver",
-					System.getProperty("user.dir") + File.separator + "geckodriver");
-		}
-
-		WebDriver driver = new FirefoxDriver(); // This will launch Firefox browser
-		driver.get("http://automationpractice.com/index.php"); // This will launch the application
-
-		driver.manage().window().maximize(); // Maximize the browser window
-
+		
 		WebElement signInLink = driver.findElement(By.xpath("//a[@class='login']")); // Will identify the sign in link
 																						// and stores
 		signInLink.click(); // Clicks the sign in link
@@ -117,23 +110,11 @@ public class seleniumTestScript1 {
 		String confirmation = driver.findElement(By.xpath("//div[@id='center_column']/h1")).getText();
 		Assert.assertEquals(confirmation, "ORDER CONFIRMATION", "FAIL -- Order not confirmed");
 
-		driver.quit();
 	}
 	
 	@Test
 	public void webdriverCommands3() throws InterruptedException {
 		
-		/*if (System.getProperty("os.name").equals("windows")) {
-			System.setProperty("webdriver.gecko.driver",
-					System.getProperty("user.dir") + File.separator + "geckodriver.exe");
-		} else {
-			System.setProperty("webdriver.gecko.driver",
-					System.getProperty("user.dir") + File.separator + "geckodriver");
-		}*/
-
-		WebDriver driver = new FirefoxDriver(); // This will launch Firefox browser
-		driver.get("http://automationpractice.com/index.php"); // This will launch the application
-
 		driver.manage().window().maximize(); // Maximize the browser window
 
 		WebElement signInLink = driver.findElement(By.xpath("//a[@class='login']")); // Will identify the sign in link
@@ -167,22 +148,19 @@ public class seleniumTestScript1 {
 		Select yearDD = new Select(yearDropdown);
 		yearDD.selectByVisibleText("1988  ");   //Year as 1988
 		
-		driver.quit();
-		
 	}
 	
-	@Test
-	public void testMethod() {
-		
-		System.out.println("This is a Test Method");
-	}
-	
-	
-	//test comment added by Chenlin Zhong
 	@Test
 	public void testMethod(){
 		
 		System.out.println("hello ");
-	}
 
+	}
+	@AfterTest
+	public void endBrowser(){
+		// driver.close(); //close the browser
+		driver.quit(); // Quit the Service and all opened instances of the browser
+	}
+		
+	
 }

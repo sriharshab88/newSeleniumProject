@@ -18,10 +18,19 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import org.testng.reporters.jq.Main;
-
+import libraries.ProjectSpecificMethods;
 import libraries.Utilities;
+import pageObjects.AddressPageObject;
+import pageObjects.CartSummaryPageObject;
 import pageObjects.HomePageObject;
 import pageObjects.LoginPageObject;
+import pageObjects.MyAccountPageObject;
+import pageObjects.OrderConfirmationPageObject;
+import pageObjects.OrderSummaryPageObject;
+import pageObjects.PaymentPageObject;
+import pageObjects.ShippingPageObject;
+import results.ExtentResults;
+import testData.TestDataReader;
 
 
 
@@ -30,90 +39,93 @@ import pageObjects.LoginPageObject;
  * This file has the test scripts for the basic functionalities of demo application
  * @author Sri harsha
  */
-public class seleniumTestScript1 {
+public class basicLevelTestCases {
 	
 	WebDriver driver;
 	WebDriverWait wait;
+	ProjectSpecificMethods projectSpecificMethods;
 	HomePageObject homepage;
 	LoginPageObject loginpage;
+	MyAccountPageObject myAccountPage;
+	CartSummaryPageObject cartSummaryPageObject;
+	AddressPageObject addressPageObject;
+	ShippingPageObject shippingPageObject;
+	PaymentPageObject paymentPageObject;
+	OrderSummaryPageObject orderSummaryPageObject;
+	OrderConfirmationPageObject orderConfirmationPageObject;
 	Utilities utilities = new Utilities();
+	ExtentResults results = new ExtentResults();
 	
 	@BeforeTest
 	public void startBrowser() {
 		driver = utilities.launchBrowser();
 		wait = new WebDriverWait(driver, 30);
 		driver.manage().window().maximize(); // Maximize the browser window
+		projectSpecificMethods = new ProjectSpecificMethods(driver, wait);
 		homepage = new HomePageObject(driver, wait);
 		loginpage = new LoginPageObject(driver, wait);
+		myAccountPage = new MyAccountPageObject(driver, wait);
+		cartSummaryPageObject = new CartSummaryPageObject(driver, wait);
+		addressPageObject = new AddressPageObject(driver, wait);
+		shippingPageObject = new ShippingPageObject(driver, wait);
+		paymentPageObject = new PaymentPageObject(driver, wait);
+		orderSummaryPageObject = new OrderSummaryPageObject(driver, wait);
+		orderConfirmationPageObject = new OrderConfirmationPageObject(driver, wait);
 	}
 	
 	@Test
-	public void webDriverCommands() throws Exception {
+	public void demoLoginTest() throws Exception {
 
+		results.createTestcase(Thread.currentThread().getStackTrace()[1].getMethodName(), 
+				this.getClass().getSimpleName());
 		Reporter.log("This is the current URL -->" + driver.getCurrentUrl(), true); // Print the url of the page.
 		Reporter.log("This is the Window title -->" + driver.getTitle(), true); // Print the title of the page.
 
-		homepage.clickSignInLink();
-		loginpage.enterUsername("testautomation88@test.com");
-		loginpage.enterPassword("123456");
-		loginpage.clickSignInButton();
+		projectSpecificMethods.signIn(TestDataReader.email, TestDataReader.password);
+	
 	}
 
 	@Test
-	public void webDriverCommands2() throws InterruptedException {
+	public void demoReorderTest() throws Exception {
 		
-		WebElement signInLink = driver.findElement(By.xpath("//a[@class='login']")); // Will identify the sign in link
-																						// and stores
-		signInLink.click(); // Clicks the sign in link
+		results.createTestcase(Thread.currentThread().getStackTrace()[1].getMethodName(), 
+				this.getClass().getSimpleName());
 
-		driver.findElement(By.xpath("//input[@id='email']")).sendKeys("testautomation88@test.com"); // Enter the
-																									// username in email
-																									// text field
-		WebElement password = driver.findElement(By.id("passwd")); // Identifies password web element and stores
-		password.sendKeys("123456"); // Enters text into the password field
-		driver.findElement(By.xpath("//button[@id='SubmitLogin']")).click(); // clicks on submit button
+		projectSpecificMethods.signIn(TestDataReader.email, TestDataReader.password);
 
-		driver.findElement(By.xpath("//img[@alt='My Store']")).click(); // click the homepage logo
-		WebDriverWait wait = new WebDriverWait(driver, 30); // creating webdriver wait instance
-
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@id='center_column']"))); // waiting
+		homepage.clickLogo();
+		homepage.waitForProductSection();
+		homepage.clickUserNameAccount();
 		
-		driver.findElement(By.xpath("//a[@class='account']")).click();
-
-		String accountPageText = driver.findElement(By.xpath("//div[@id='center_column']/h1")).getText();
-
-		Assert.assertEquals(accountPageText, "MY ACCOUNT", "FAIL -- The account page text is not displayed properly");
-
-		driver.findElement(By.xpath("//a[@title='Orders']")).click();
-
-		driver.findElement(By.xpath("//a[contains(text(),'DHZQDWAXX')]")).click();
-		wait.until(ExpectedConditions
-				.visibilityOfAllElementsLocatedBy(By.xpath("//a[contains(@class,'button btn btn-default')]")));
-
-		driver.findElement(By.xpath("//a[contains(@class,'button btn btn-default')]")).click();
-
-		String product = driver.findElement(By.xpath("//p[@class='product-name']/a")).getText();
-
+		String accountPageText = myAccountPage.getMyAccountText();
+		results.assertEquals(accountPageText, TestDataReader.myAccountText, 
+				TestDataReader.myAccountValidationMessage);
+		
+		myAccountPage.clickOrderLink();
+		myAccountPage.clickOnSubmittedOrder();
+		myAccountPage.clickOnReOrderButton();
+		
+		//String product = cartSummaryPageObject.getProductNameText();
 		// Assert.assertEquals(product, "Faded Short Sleeve T-shirts", "FAIL -- Product
 		// does not match");
 
-		JavascriptExecutor executor = (JavascriptExecutor) driver;
-		executor.executeScript("window.scrollBy(0,900)", "");
+		projectSpecificMethods.pageScroll("0", "900");
+		
+		cartSummaryPageObject.clickProceedToCheckoutButton();
+		addressPageObject.clickProceesAddressButton();
+		shippingPageObject.clickTosCheckbox();
+		shippingPageObject.clickProcessCarrierButton();
+		paymentPageObject.clickBankWireMethod();
+		orderSummaryPageObject.clickConfirmOrderButton();
 
-		driver.findElement(By.xpath("//p[@class='cart_navigation clearfix']/a[@title='Proceed to checkout']")).click();
-		driver.findElement(By.xpath("//button[@name='processAddress']")).click();
-		driver.findElement(By.xpath("//div[@id='uniform-cgv']")).click();
-		driver.findElement(By.xpath("//button[@name='processCarrier']")).click();
-		driver.findElement(By.xpath("//a[@class='bankwire']")).click();
-		driver.findElement(By.xpath("//p[@id='cart_navigation']/button")).click();
-
-		String confirmation = driver.findElement(By.xpath("//div[@id='center_column']/h1")).getText();
-		Assert.assertEquals(confirmation, "ORDER CONFIRMATION", "FAIL -- Order not confirmed");
+		String confirmation = orderConfirmationPageObject.getOrderConfirmationMessage();
+		results.assertEquals(confirmation, TestDataReader.orderConfirmationText, 
+				TestDataReader.orderConfirmationTextValidationMessage);
 
 	}
 	
 	@Test
-	public void webdriverCommands3() throws InterruptedException {
+	public void demoSelectDropDownTest() throws InterruptedException {
 		
 		driver.manage().window().maximize(); // Maximize the browser window
 
@@ -155,6 +167,12 @@ public class seleniumTestScript1 {
 		
 		System.out.println("hello ");
 
+	}
+	
+	//@Test(dataProviderClass=TestData.class, dataProvider = "getSearchTestData")
+	public void emailIDValidations() {
+		
+		
 	}
 	@AfterTest
 	public void endBrowser(){

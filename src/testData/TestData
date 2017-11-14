@@ -1,0 +1,7 @@
+#LOGIN TESTDATA
+email = testautomation88@test.com
+password = 123456
+myAccountText = MY ACCOUNT
+accountTextValidationMessage = The account page text status
+orderConfirmationText = ORDER CONFIRMATION
+orderConfirmationTextValidationMessage = Order confirmation status

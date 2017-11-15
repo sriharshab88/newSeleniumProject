@@ -18,6 +18,8 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import org.testng.reporters.jq.Main;
+
+import libraries.GenericMethods;
 import libraries.ProjectSpecificMethods;
 import libraries.Utilities;
 import pageObjects.AddressPageObject;
@@ -31,6 +33,7 @@ import pageObjects.PaymentPageObject;
 import pageObjects.ShippingPageObject;
 import results.ExtentResults;
 import testData.TestDataReader;
+import testData.demoApplicationTestData;
 
 
 
@@ -125,7 +128,10 @@ public class basicLevelTestCases {
 	}
 	
 	@Test
-	public void demoSelectDropDownTest() throws InterruptedException {
+	public void demoSelectDropDownTest() throws Exception {
+		
+		results.createTestcase(Thread.currentThread().getStackTrace()[1].getMethodName(), 
+				this.getClass().getSimpleName());
 		
 		driver.manage().window().maximize(); // Maximize the browser window
 
@@ -160,24 +166,41 @@ public class basicLevelTestCases {
 		Select yearDD = new Select(yearDropdown);
 		yearDD.selectByVisibleText("1988  ");   //Year as 1988
 		
+		/*regsitrationPage.selectDateByIndex(8);
+		regsitrationPage.selectMonthByValue("7");
+		regsitrationPage.selectYearByVisibleText("1988  ");*/
+		
+		
 	}
 	
 	@Test
-	public void testMethod(){
+	public void testMethod() throws Exception{
 		
-		System.out.println("hello ");
+		results.createTestcase(Thread.currentThread().getStackTrace()[1].getMethodName(), 
+				this.getClass().getSimpleName());
+		
+		results.log("PASS -- This is a Dummy Test Case", true);
 
 	}
 	
-	//@Test(dataProviderClass=TestData.class, dataProvider = "getSearchTestData")
-	public void emailIDValidations() {
+	
+	@Test(dataProviderClass = demoApplicationTestData.class, dataProvider = "LoginValidationData")
+	public void signInValidations(String testCaseTitle, String userName, String password, String errorMessage) throws Exception {
+		
+		results.createTestcase(Thread.currentThread().getStackTrace()[1].getMethodName()
+				+"--"+testCaseTitle, this.getClass().getSimpleName());
+		
+		projectSpecificMethods.signIn(userName, password);
+		String actualErrorMessage = loginpage.getErrorMessage();
+		results.assertEquals(actualErrorMessage, errorMessage, 
+				"Comparision of error messages");
 		
 		
 	}
 	@AfterTest
 	public void endBrowser(){
-		// driver.close(); //close the browser
-		driver.quit(); // Quit the Service and all opened instances of the browser
+		driver.close(); //close the browser
+		//driver.quit(); // Quit the Service and all opened instances of the browser
 	}
 		
 	

@@ -42,4 +42,11 @@ public class LoginPageObject {
 				"FAIL -- Password text field not found");
 		results.log("Password text field found", true);
 	}
+	
+	public String getErrorMessage() throws Exception {
+		String result = genericMethods.getTextByXpath("//div[@class='alert alert-danger']/ol/li", 
+				"FAIL -- Error message is not found");
+		results.log("PASS -- Error message '"+result+"' is fetched from login page", true);
+		return result;
+	}
 }
